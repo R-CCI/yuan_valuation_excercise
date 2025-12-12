@@ -367,6 +367,138 @@ cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
 st.write(debt_long/equity_total)
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+# -----------------------------------------------------------
+# Monte Carlo DCF Projection Function
+# -----------------------------------------------------------
+
+def monte_carlo_dcf(distros, 
+                    current_revenue,
+                    cash,
+                    debt,
+                    shares_outstanding,
+                    wacc=0.09,
+                    tgr=0.02,
+                    horizon=10,
+                    n_sims=20000):
+
+    # unpack distributions
+    rev_growth_sampler   = distros["rev_growth"]
+    ebit_margin_sampler  = distros["ebit_margin"]
+    dep_ratio_sampler    = distros["dep_ratio"]
+    sales_to_cap_sampler = distros["sales_to_cap"]
+    tax_rate_sampler     = distros["tax_rate"]
+
+    # generate simulation vectors
+    rev_growth   = rev_growth_sampler(n_sims)          # growth rate
+    ebit_margin  = ebit_margin_sampler(n_sims)         # EBIT margin
+    dep_ratio    = dep_ratio_sampler(n_sims)           # dep / revenue
+    sales_to_cap = sales_to_cap_sampler(n_sims)        # revenue / assets
+    tax_rate     = tax_rate_sampler(n_sims)            # tax
+
+    # initialize arrays
+    revenues = np.zeros((horizon + 1, n_sims))
+    ebit     = np.zeros((horizon + 1, n_sims))
+    fcff     = np.zeros((horizon, n_sims))
+
+    # year 0 revenue
+    revenues[0] = current_revenue
+
+    # MAIN PROJECTIONS
+    for t in range(1, horizon + 1):
+        # revenue projection
+        revenues[t] = revenues[t-1] * (1 + rev_growth)
+
+        # EBIT
+        ebit[t] = revenues[t] * ebit_margin
+
+        # NOPAT
+        nopat = ebit[t] * (1 - tax_rate)
+
+        # depreciation
+        depreciation = revenues[t] * dep_ratio
+
+        # reinvestment using sales-to-cap
+        reinvestment = (revenues[t] - revenues[t-1]) / sales_to_cap
+
+        # FCFF
+        fcff[t-1] = nopat + depreciation - reinvestment
+
+    # Terminal value
+    terminal_fcff = fcff[-1] * (1 + tgr)
+    terminal_value = terminal_fcff / (wacc - tgr)
+
+    # Discounted FCFF
+    discount_factors = (1 + wacc) ** np.arange(1, horizon + 1)
+    pv_fcff = (fcff / discount_factors).sum(axis=0)
+    pv_terminal = terminal_value / ((1 + wacc) ** horizon)
+
+    # Enterprise value
+    ev = pv_fcff + pv_terminal
+
+    # Equity value
+    equity_value = ev + cash - debt
+    equity_per_share = equity_value / shares_outstanding
+
+    return {
+        "ev": ev,
+        "equity_value": equity_value,
+        "equity_per_share": equity_per_share,
+        "fcff": fcff,
+        "revenues": revenues
+    }
+
+# -----------------------------------------------------------
+# Example usage (replace with your real numbers)
+# -----------------------------------------------------------
+
+# Example placeholders — replace these with real values
+current_revenue     = 100_000_000_000     # last fiscal year revenue
+cash                = 20_000_000_000
+debt                = 15_000_000_000
+shares_outstanding  = 2_500_000_000
+wacc                = 0.09
+tgr                 = 0.02
+
+results = monte_carlo_dcf(
+    distros=distros,                # <-- from previous code
+    current_revenue=current_revenue,
+    cash=cash,
+    debt=debt,
+    shares_outstanding=shares_outstanding,
+    wacc=wacc,
+    tgr=tgr,
+    horizon=10,
+    n_sims=20000
+)
+
+fig = px.histogram(
+    vals,
+    nbins=bins,
+    title="Distribution of Simulated Equity Value per Share",
+    opacity=0.75
+)
+
+# Add expected value vertical line
+fig.add_vline(
+    x=mean_val,
+    line_width=3,
+    line_dash="dash",
+    line_color="red",
+    annotation_text=f"Mean: {mean_val:,.2f}",
+    annotation_position="top right"
+)
+
+fig.update_layout(
+    xaxis_title="Equity Value per Share",
+    yaxis_title="Frequency",
+    bargap=0.05,
+    template="plotly_white"
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.write(extract_dcf_variables(income, balance))
 
