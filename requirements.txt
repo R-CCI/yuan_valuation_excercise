@@ -1,5 +1,6 @@
 streamlit==1.39.0
 yfinance
+plotly
 yahooquery
 pdfplumber==0.11.0
 pandas==2.2.2
