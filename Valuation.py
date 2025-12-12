@@ -280,8 +280,6 @@ with st.sidebar:
     n_sims = st.select_slider("Monte Carlo Simulations", [1000, 5000, 10000, 25000, 50000], 10000)
     n_years = st.slider("Projection Years", 3, 10, 5)
 
-# Main content
-col1, col2 = st.columns([1, 2])
 
 STD_CAP = 0.10
 
@@ -637,10 +635,7 @@ def main():
         # Financial Structure
         st.markdown('<div class="input-section"><div style="font-size:1.3rem;font-weight:500;color:#c584f7">Financial Structure</div>', unsafe_allow_html=True)
         
-        debt = st.number_input("Total Debt (millions)", 0.0, value=200.0, format="%.1f")
-        cash = st.number_input("Cash & Equivalents (millions)", 0.0, value=50.0, format="%.1f")
-        
-        net_debt = debt - cash
+        net_debt = debt_long - cash
         d2e = debt / (price * shares) if price * shares > 0 else 0
         
         cod = st.number_input("Cost of Debt", 0.0, 0.15, 0.04, 0.005, format="%.3f")
