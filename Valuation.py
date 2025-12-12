@@ -445,13 +445,9 @@ def monte_carlo_dcf(distros,
         "revenues": revenues
     }
 
-# -----------------------------------------------------------
-# Example usage (replace with your real numbers)
-# -----------------------------------------------------------
 
-# Example placeholders — replace these with real values
-current_revenue     = income.loc['Total Revenue'].loc[0]     
-debt                = debt_long
+current_revenue = income.loc['Total Revenue'].loc[0]     
+debt = debt_long
 shares_outstanding  = sharesOutstanding
 
 results = monte_carlo_dcf(
