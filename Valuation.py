@@ -628,7 +628,7 @@ def main():
                 else:
                     st.error(err or "Unable to fetch beta")
         
-        beta = st.metric("Beta Coefficient", beta)
+        #beta = st.metric("Beta Coefficient", beta)
         
         st.markdown('</div>', unsafe_allow_html=True)
         
