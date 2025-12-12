@@ -86,7 +86,7 @@ def fetch_data(ticker_symbol):
   levered_beta = info.get('beta', 1.0)
   
   return {
-        "sharesOutstanding": sharesOutstanding,
+        "sharesOutstanding": shares_outstanding,
         "marketCap": equity_value,
         "total_debt": debt_value,
         "ebit": ebit, 
