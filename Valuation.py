@@ -47,7 +47,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 import pdfplumber
 import yfinance as yf
-
+import yahooquery as yq
 
 st.set_page_config(page_title="Valoración de Acciones", layout="wide")
 
