@@ -255,7 +255,7 @@ wacc = st.sidebar.number_input("WACC (%)", value=19.48, step=0.1) / 100
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
 
-dict_data = fetch_data('NVDA')
+#dict_data = fetch_data('NVDA')
 res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'].T, res['income'].T, res['cashflow'].T
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
