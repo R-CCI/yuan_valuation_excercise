@@ -358,8 +358,8 @@ def fit_truncated_normal(series, max_std=0.10):
 
     # compute truncated bounds (± 3 std by default)
     lower, upper = series.min(), series.max()
-    a = (lower - mu) / sigma
-    b = (upper - mu) / sigma
+    a = ((lower - mu) / sigma)/2
+    b = ((upper - mu) / sigma)/2
 
     def sampler(n):
         return truncnorm.rvs(a, b, loc=mu, scale=sigma, size=n)
