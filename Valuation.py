@@ -363,7 +363,7 @@ equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
 sharesOutstanding = balance.loc['Share Issued'].iloc[0]
 cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
-rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
+#rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
 
 st.write(debt_long/equity_total)
 
