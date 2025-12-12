@@ -424,7 +424,7 @@ def monte_carlo_dcf(distros,
     # Terminal value
     terminal_fcff = fcff[-1] * (1 + tgr)
     terminal_value = terminal_fcff / (wacc - tgr)
-    print(fcff)
+    st.write(fcff)
     # Discounted FCFF
     discount_factors = ((1 + wacc) ** np.arange(1, horizon + 1)).reshape(-1, 1)
     pv_fcff = (fcff / discount_factors).sum(axis=0)
