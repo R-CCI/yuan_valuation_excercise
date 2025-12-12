@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY . ./
 
+RUN pip install yfinance --upgrade
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 
