@@ -90,7 +90,7 @@ def fetch_data(ticker_symbol):
         "marketCap": equity_value,
         "total_debt": debt_value,
         "ebit": ebit, 
-        "beta": beta
+        "beta": levered_beta
     }, ticker.balance_sheet, ticker.income_stmt 
 
 # Sidebar parameters
