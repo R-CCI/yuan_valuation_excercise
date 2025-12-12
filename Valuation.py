@@ -52,7 +52,7 @@ import yfinance as yf
 st.set_page_config(page_title="Valoración de Acciones", layout="wide")
 
 st.title("Valoración de Acciones")
-st.header("### Flujo de Caja Descontado")
+st.subheader("Flujo de Caja Descontado")
 
 def fetch_data(ticker_symbol):
   ticker = yf.Ticker(ticker_symbol)
