@@ -84,8 +84,8 @@ def fetch_data(ticker_symbol):
   # --- WACC Inputs ---
   # Levered Beta
   levered_beta = info.get('beta', 1.0)
-
-return {
+  
+  return {
         "sharesOutstanding": sharesOutstanding,
         "marketCap": equity_value,
         "total_debt": debt_value,
