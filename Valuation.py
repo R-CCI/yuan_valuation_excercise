@@ -268,5 +268,9 @@ st.dataframe(balance)
 st.dataframe(income)
 st.dataframe(cashflow)
 
+rates_df = pd.read_csv('rates.csv', parse_dates=["Date"]).set_index("Date")
+rfr = rates_df.iloc[-1]['10 Yr']
+
+st.write(rfr)
 
 
