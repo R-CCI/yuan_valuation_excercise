@@ -446,7 +446,7 @@ def monte_carlo_dcf(distros,
     }
 
 st.write(income)
-current_revenue = income.loc['Total Revenue'].loc[0]     
+current_revenue = income.loc['Total Revenue'].iloc[0]     
 debt = debt_long
 shares_outstanding  = sharesOutstanding
 
