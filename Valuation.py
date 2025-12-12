@@ -248,7 +248,7 @@ def fetch_data(ticker_symbol):
 
 # Sidebar parameters
 st.sidebar.header("Parámetros")
-ticker_symbol = st.sidebar_text_input('Ticker', value='NVDA')
+ticker_symbol = st.sidebar.text_input('Ticker', value='NVDA')
 wacc = st.sidebar.number_input("WACC (%)", value=19.48, step=0.1) / 100
 fx_rate = st.sidebar.number_input("Tasa de Cambio DOP/USD", value=63.0, step=0.5)
 
