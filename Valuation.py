@@ -49,6 +49,7 @@ import pdfplumber
 import yfinance as yf
 import yahooquery as yq
 import subprocess
+from scipy.stats import beta, triang, lognorm, norm
 
 st.set_page_config(page_title="Valoración de Acciones", layout="wide")
 
@@ -256,7 +257,105 @@ wacc = st.sidebar.number_input("WACC (%)", value=19.28, step=0.1) / 100
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
 
-#dict_data = fetch_data('NVDA')
+
+def fit_lognormal(series):
+    """Fit a lognormal distribution from data."""
+    log_vals = np.log(series)
+    mu, sigma = log_vals.mean(), log_vals.std()
+    def sampler(n):
+        return np.exp(np.random.normal(mu, sigma, n))
+    return sampler, {"dist":"lognormal", "mu":mu, "sigma":sigma}
+
+def fit_beta(series):
+    """Fit Beta distribution using method of moments."""
+    a = ((series.mean() * (1 - series.mean())) / series.var() - 1) * series.mean()
+    b = ((series.mean() * (1 - series.mean())) / series.var() - 1) * (1 - series.mean())
+    a, b = max(a,1e-3), max(b,1e-3)
+    def sampler(n):
+        return np.random.beta(a, b, n)
+    return sampler, {"dist":"beta", "a":a, "b":b}
+
+def fit_normal(series):
+    mu, sigma = series.mean(), series.std()
+    def sampler(n):
+        return np.random.normal(mu, sigma, n)
+    return sampler, {"dist":"normal", "mu":mu, "sigma":sigma}
+
+def fit_triangular(series):
+    """Triangular distribution: min, mode(last), max"""
+    c = (series.iloc[-1] - series.min()) / (series.max() - series.min())
+    def sampler(n):
+        return triang.rvs(c=c, loc=series.min(), scale=series.max()-series.min(), size=n)
+    return sampler, {"dist":"triangular", "min":series.min(), "mode":series.iloc[-1], "max":series.max()}
+
+# -----------------------------------------------------------
+# 2. Automatic picker
+# -----------------------------------------------------------
+
+def infer_distribution(series):
+    """Automatically select distribution based on data properties."""
+    series = series.dropna()
+    if len(series) < 3:
+        return fit_triangular(series)
+
+    skew = series.skew()
+
+    # bounded (0,1)
+    if series.min() > 0 and series.max() < 1:
+        return fit_beta(series)
+
+    # positive + right skew → lognormal
+    if (series > 0).all() and skew > 0.5:
+        return fit_lognormal(series)
+
+    # fallback
+    return fit_normal(series)
+
+def extract_dcf_variables(income, bs):
+    out = {}
+    # --------------------
+    # Revenue growth
+    # --------------------
+    revenues = income.loc["Total Revenue"].sort_index()
+    rev_growth = revenues.pct_change().dropna()
+    sampler, info = infer_distribution(rev_growth)
+    out["rev_growth"] = sampler
+    out["rev_growth_info"] = info
+
+    # EBIT margin
+    ebit = income.loc["Operating Income"].sort_index()
+    ebit_margin = (ebit / revenues).dropna()
+    sampler, info = infer_distribution(ebit_margin)
+    out["ebit_margin"] = sampler
+    out["ebit_margin_info"] = info
+
+    # Depreciation / revenue
+    if "Depreciation" in income.index:
+        dep_ratio = (income.loc["Depreciation"] / revenues).dropna()
+    else:
+        dep_ratio = (income.loc["Reconciled Depreciation"] / revenues).dropna()
+
+    sampler, info = infer_distribution(dep_ratio)
+    out["dep_ratio"] = sampler
+    out["dep_ratio_info"] = info
+
+    # Sales-to-capital
+    assets = bs.loc["Total Assets"].sort_index()
+    sales_to_cap = (revenues / assets).dropna()
+    sampler, info = infer_distribution(sales_to_cap)
+    out["sales_to_cap"] = sampler
+    out["sales_to_cap_info"] = info
+
+    # Tax rate
+    tax_exp = income.loc["Income Tax"].sort_index()
+    pretax = income.loc["Pretax Income"].sort_index()
+    tax_rate = (tax_exp / pretax).clip(0,1).dropna()
+    sampler, info = infer_distribution(tax_rate)
+    out["tax_rate"] = sampler
+    out["tax_rate_info"] = info
+
+    return out
+
 res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'].T, res['income'].T, res['cashflow'].T
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
@@ -264,14 +363,15 @@ equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
 sharesOutstanding = balance.loc['Share Issued'].iloc[0]
 cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
+rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
+
 st.write(debt_long/equity_total)
 st.dataframe(balance)
 st.dataframe(income)
 st.dataframe(cashflow)
 
-rates_df = pd.read_csv('rates.csv', parse_dates=["Date"]).set_index("Date")
-rfr = rates_df.iloc[-1]['10 Yr']
 
-st.write(rates_df)
+
+st.write(extract_dcf_variables(income, balance))
 
 
