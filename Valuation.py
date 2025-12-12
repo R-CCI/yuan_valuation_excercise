@@ -434,6 +434,7 @@ res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','ca
 balance, income, cashflow = res['balance'].T * 1000, res['income'].T * 1000, res['cashflow'].T * 1000
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
+st.write(yq.Ticker(ticker_symbol).key_stats[f'{ticker_symbol}'])
 sharesOutstanding = yq.Ticker(ticker_symbol).key_stats[f'{ticker_symbol}']['sharesOutstanding']
 cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
