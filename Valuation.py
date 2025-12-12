@@ -201,7 +201,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
             combined = combined.copy()
             combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
             combined['source'] = [source_map.get(idx, 'annual') for idx in combined.index]
-            mark that balance sheet rows are not annualized
+            #mark that balance sheet rows are not annualized
             combined['annualized_partial'] = False
         out['balance'] = combined[[c for c in combined.columns if c not in ['is_trailing', 'source', 'annualized_partial']]]
 
