@@ -432,7 +432,7 @@ def extract_dcf_variables(income, bs):
     return out
 
 res, number_shares= get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
-balance, income, cashflow = res['balance'].T * 1000, res['income'].T * 1000, res['cashflow'].T * 1000
+balance, income, cashflow = res['balance'].T, res['income'].T , res['cashflow'].T 
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
 sharesOutstanding = number_shares
