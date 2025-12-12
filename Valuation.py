@@ -366,10 +366,6 @@ cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
 
 st.write(debt_long/equity_total)
-st.dataframe(balance)
-st.dataframe(income)
-st.dataframe(cashflow)
-
 
 
 st.write(extract_dcf_variables(income, balance))
