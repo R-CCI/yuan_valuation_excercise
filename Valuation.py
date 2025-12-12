@@ -440,7 +440,7 @@ def monte_carlo_dcf(distros,
 
     # year 0 revenue
     revenues[0] = current_revenue
-
+    st.write(rev_growth)
     # MAIN PROJECTIONS
     for t in range(1, horizon + 1):
         # revenue projection
