@@ -432,7 +432,7 @@ def monte_carlo_dcf(distros,
 
     # Enterprise value
     ev = pv_fcff + pv_terminal
-
+    print(ev)
     # Equity value
     equity_value = ev + cash - debt
     equity_per_share = equity_value / shares_outstanding
@@ -504,6 +504,7 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
 
 
 
