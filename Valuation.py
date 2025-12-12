@@ -424,7 +424,7 @@ def extract_dcf_variables(income, bs):
     # NWC
     nwc = bs.loc["Working Capital"].sort_index().sort_index().diff()
     nwc_pct = (nwc / revenues).dropna()
-    sampler, info = fit_truncated_normal(capex_pct)
+    sampler, info = fit_truncated_normal(nwc_pct)
     out["nwc"] = sampler
     out["nwc_info"] = info
     
