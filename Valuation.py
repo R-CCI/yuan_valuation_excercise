@@ -254,6 +254,7 @@ st.sidebar.header("Parámetros")
 ticker_symbol = st.sidebar.text_input('Ticker', value='NVDA')
 tax_rate = st.sidebar.number_input('Tax Rate (%)', value=21, step=1)/100
 wacc = st.sidebar.number_input("WACC (%)", value=19.28, step=0.1) / 100
+wacc = st.sidebar.number_input("Crecimiento de la Perpetuidad (%)", value=5, step=0.1) / 100
 
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
@@ -368,13 +369,6 @@ cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
 st.write(debt_long/equity_total)
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-# -----------------------------------------------------------
-# Monte Carlo DCF Projection Function
-# -----------------------------------------------------------
-
 def monte_carlo_dcf(distros, 
                     current_revenue,
                     cash,
@@ -456,12 +450,9 @@ def monte_carlo_dcf(distros,
 # -----------------------------------------------------------
 
 # Example placeholders — replace these with real values
-current_revenue     = 100_000_000_000     # last fiscal year revenue
-cash                = 20_000_000_000
-debt                = 15_000_000_000
-shares_outstanding  = 2_500_000_000
-wacc                = 0.09
-tgr                 = 0.02
+current_revenue     = income.loc['Total Revenue'].loc[0]     
+debt                = debt_long
+shares_outstanding  = sharesOutstanding
 
 results = monte_carlo_dcf(
     distros=distros,                # <-- from previous code
