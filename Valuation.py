@@ -605,9 +605,12 @@ mean_val = vals.mean()
 
 def main():
     # Header
-    st.markdown('<h1 class="main-header">Stocks Valuation Simulation</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Using Monte Carlo for intrinsic value estimation</p>', unsafe_allow_html=True)
-    
+    res, number_shares, price = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
+    balance, income, cashflow = res['balance'].T, res['income'].T , res['cashflow'].T 
+    debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
+    equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
+    sharesOutstanding = number_shares
+    cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
     # Sidebar
     # Main content
     col1, col2 = st.columns([1, 2])
@@ -618,16 +621,8 @@ def main():
         
         shares = sharesOutstanding
         
-        if st.button("Fetch Beta", use_container_width=True):
-            with st.spinner("Fetching..."):
-                beta, err, mkt_info = fetch_stock_beta(ticker)
-                if beta:
-                    st.session_state.fetched_beta = 1.68
-                    st.session_state.mp_calc = 0.065
-                    st.success(f"Beta: {beta:.3f}")
-                else:
-                    st.error(err or "Unable to fetch beta")
-        
+        beta, err, mkt_info =  1.68, 0.065, 1
+       
         #beta = st.metric("Beta Coefficient", beta)
         
         st.markdown('</div>', unsafe_allow_html=True)
