@@ -445,7 +445,7 @@ def monte_carlo_dcf(distros,
         "revenues": revenues
     }
 
-st.write(income)
+
 current_revenue = income.loc['Total Revenue'].iloc[0]     
 debt = debt_long
 shares_outstanding  = sharesOutstanding
@@ -471,18 +471,18 @@ mean_val = vals.mean()
 # Streamlit UI
 # -----------------------------------------------------------
 
-st.title("Monte Carlo DCF – Equity Value Distribution")
+st.title(f"Monte Carlo DCF – {ticker_symbol}")
 
-st.subheader(f"Expected Value per Share: **${mean_val:,.2f}**")
+st.subheader(f"Valor Esperado por Acción: **${mean_val:,.2f}**")
 
 # Histogram bins selector
-bins = st.slider("Number of histogram bins", min_value=20, max_value=200, value=80)
+bins = 80 #st.slider("Number of histogram bins", min_value=20, max_value=200, value=80)
 
 
 fig = px.histogram(
     vals,
     nbins=bins,
-    title="Distribution of Simulated Equity Value per Share",
+    title="DistribuCion del Valor por Acción",
     opacity=0.75
 )
 
