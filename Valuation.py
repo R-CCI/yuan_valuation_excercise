@@ -254,7 +254,7 @@ st.sidebar.header("Parámetros")
 ticker_symbol = st.sidebar.text_input('Ticker', value='NVDA')
 tax_rate = st.sidebar.number_input('Tax Rate (%)', value=21, step=1)/100
 wacc = st.sidebar.number_input("WACC (%)", value=19.28, step=0.1) / 100
-tgr = st.sidebar.number_input("Crecimiento de la Perpetuidad (%)", value=5, step=0.1) / 100
+tgr = st.sidebar.number_input("Crecimiento de la Perpetuidad (%)", value=5.0, step=0.5) / 100
 
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
