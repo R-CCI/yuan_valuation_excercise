@@ -112,6 +112,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
       - Balance sheet is point-in-time: no TTM sum; if annual missing, we use most recent quarter and flag it.
     """
     ticker_obj = yf.Ticker(ticker_symbol)
+    number_shares = ticker_obj.info['sharesOutstanding']                                      
     out = {}
     # fetch all relevant raw dfs from yfinance
     raw_income_annual = _transpose_and_parse(ticker_obj.financials)       # annual income
@@ -208,7 +209,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
             combined['annualized_partial'] = False
         out['balance'] = combined[[c for c in combined.columns if c not in ['is_trailing', 'source', 'annualized_partial']]]
 
-    return out
+    return out, number_shares
 
 def fetch_data(ticker_symbol):
   ticker = yf.Ticker(ticker_symbol)
@@ -430,11 +431,11 @@ def extract_dcf_variables(income, bs):
 
     return out
 
-res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
+res, number_shares= get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'].T * 1000, res['income'].T * 1000, res['cashflow'].T * 1000
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
-sharesOutstanding = yf.Ticker('NVDA').info['sharesOutstanding']
+sharesOutstanding = number_shares
 cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
 #rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
