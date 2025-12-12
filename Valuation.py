@@ -341,8 +341,9 @@ def capped_std(series, cap=0.10):
     sigma = min(series.std(), abs(mu) * cap)
     return mu, sigma
 
-def fit_truncated_normal(series, low, high):
+def fit_truncated_normal(series):
     """Fit a truncated normal within business logic bounds."""
+    low, high = series.min(), min(series.max(), 0.30)
     mu, sigma = capped_std(series)
     
     a = (low - mu) / sigma
