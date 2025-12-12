@@ -95,7 +95,7 @@ def compute_ttm_from_quarters(q_df, metric_cols=None, annualize_partial=True):
     result.attrs['annualized_partial'] = annualized_partial
     return result
 
-def get_financials_with_annualized_ttm(ticker: str,
+def get_financials_with_annualized_ttm(ticker_symbol: str,
                                       statements=('income', 'cashflow', 'balance'),
                                       annualize_partial=True):
     """
@@ -248,7 +248,7 @@ def fetch_data(ticker_symbol):
 
 # Sidebar parameters
 st.sidebar.header("Parámetros")
-
+ticker_symbol = st.sidebar_text_input('Ticker', value='NVDA')
 wacc = st.sidebar.number_input("WACC (%)", value=19.48, step=0.1) / 100
 fx_rate = st.sidebar.number_input("Tasa de Cambio DOP/USD", value=63.0, step=0.5)
 
@@ -256,7 +256,7 @@ st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
 
 dict_data = fetch_data('NVDA')
-res = get_financials_with_annualized_ttm(ticker, statements=('income','cashflow','balance'), annualize_partial=True)
+res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'], res['income'], res['cashflow']
 
 st.dataframe(balance)
