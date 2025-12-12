@@ -622,13 +622,13 @@ def main():
             with st.spinner("Fetching..."):
                 beta, err, mkt_info = fetch_stock_beta(ticker)
                 if beta:
-                    st.session_state.fetched_beta = beta
-                    st.session_state.mp_calc = mkt_info['market_premium']
+                    st.session_state.fetched_beta = 1.68
+                    st.session_state.mp_calc = 0.065
                     st.success(f"Beta: {beta:.3f}")
                 else:
                     st.error(err or "Unable to fetch beta")
         
-        beta = st.number_input("Beta Coefficient", 0.1, 3.0, st.session_state.get('fetched_beta', 1.0), 0.01, format="%.3f")
+        beta = st.metric("Beta Coefficient", beta)
         
         st.markdown('</div>', unsafe_allow_html=True)
         
