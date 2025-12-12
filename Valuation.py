@@ -611,17 +611,6 @@ def main():
     st.markdown('<p class="sub-header">Using Monte Carlo for intrinsic value estimation</p>', unsafe_allow_html=True)
     
     # Sidebar
-    with st.sidebar:
-        st.header("Configuration")
-        
-        st.subheader("Market Parameters")
-        rf = st.number_input("Risk-Free Rate", 0.0, 0.10, 0.045, 0.005, format="%.3f")
-        mp = st.number_input("Market Risk Premium", 0.03, 0.12, st.session_state.get('mp_calc', 0.065), 0.005, format="%.3f")
-        
-        st.subheader("Simulation Settings")
-        n_sims = st.select_slider("Monte Carlo Simulations", [1000, 5000, 10000, 25000, 50000], 10000)
-        n_years = st.slider("Projection Years", 3, 10, 5)
-    
     # Main content
     col1, col2 = st.columns([1, 2])
     
