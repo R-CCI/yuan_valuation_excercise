@@ -414,10 +414,24 @@ def extract_dcf_variables(income, bs):
     out["dep_ratio"] = sampler
     out["dep_ratio_info"] = info
 
+    # CAPEX
+    capex = bs.loc["Net PPE"].sort_index().sort_index().diff()
+    capex_pct = (capex / revenues).dropna()
+    sampler, info = fit_truncated_normal(capex_pct)
+    out["capex"] = sampler
+    out["capex_info"] = info
+    
+    # NWC
+    nwc = bs.loc["Working Capital"].sort_index().sort_index().diff()
+    nwc_pct = (nwc / revenues).dropna()
+    sampler, info = fit_truncated_normal(capex_pct)
+    out["nwc"] = sampler
+    out["nwc_info"] = info
+    
     # Sales-to-capital
     assets = bs.loc["Total Assets"].sort_index()
     sales_to_cap = (revenues / assets).dropna()
-    sampler, info = infer_distribution(sales_to_cap)
+    sampler, info = fit_truncated_normal(sales_to_cap)
     out["sales_to_cap"] = sampler
     out["sales_to_cap_info"] = info
 
@@ -425,7 +439,7 @@ def extract_dcf_variables(income, bs):
     tax_exp = income.loc["Tax Provision"].sort_index()
     pretax = income.loc["Pretax Income"].sort_index()
     tax_rate = (tax_exp / pretax).clip(0,1).dropna()
-    sampler, info = infer_distribution(tax_rate)
+    sampler, info = fit_truncated_normal(tax_rate)
     out["tax_rate"] = sampler
     out["tax_rate_info"] = info
 
@@ -456,6 +470,8 @@ def monte_carlo_dcf(distros,
     rev_growth_sampler   = distros["rev_growth"]
     ebit_margin_sampler  = distros["ebit_margin"]
     dep_ratio_sampler    = distros["dep_ratio"]
+    capex_ratio_sampler = distros["capex"]
+    nwc_ratio_sampler = distros["nwc"]
     sales_to_cap_sampler = distros["sales_to_cap"]
     tax_rate_sampler     = distros["tax_rate"]
 
@@ -463,6 +479,8 @@ def monte_carlo_dcf(distros,
     rev_growth   = rev_growth_sampler(n_sims)          # growth rate
     ebit_margin  = ebit_margin_sampler(n_sims)         # EBIT margin
     dep_ratio    = dep_ratio_sampler(n_sims)           # dep / revenue
+    capex_ratio  = capex_ratio_sampler(n_sims)
+    nwc_ratio    = nwc_ratio_sampler(n_sims)
     sales_to_cap = sales_to_cap_sampler(n_sims)        # revenue / assets
     tax_rate     = tax_rate_sampler(n_sims)            # tax
 
@@ -491,8 +509,14 @@ def monte_carlo_dcf(distros,
         # reinvestment using sales-to-cap
         reinvestment = (revenues[t] - revenues[t-1]) / sales_to_cap
 
+        # reinvestment using sales-to-cap
+        capex_fc = revenues[t] * capex_ratio
+
+        # reinvestment using sales-to-cap
+        nwc_fc = revenues[t] * nwc_ratio
+
         # FCFF
-        fcff[t-1] = nopat + depreciation - reinvestment
+        fcff[t-1] = nopat + depreciation - capex_fc - nwc_fc
 
     # Terminal value
     terminal_fcff = fcff[-1] * (1 + tgr)
