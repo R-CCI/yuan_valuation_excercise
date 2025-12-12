@@ -50,7 +50,7 @@ import pdfplumber
 import yfinance as yf
 import yahooquery as yq
 import subprocess
-from scipy.stats import beta, triang, lognorm, norm
+from scipy.stats import beta, triang, lognorm, norm, truncnorm
 
 st.set_page_config(page_title="Valoración de Acciones", layout="wide")
 
