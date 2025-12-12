@@ -394,7 +394,7 @@ def extract_dcf_variables(income, bs):
     # --------------------
     revenues = income.loc["Total Revenue"].sort_index()
     rev_growth = revenues.pct_change().dropna()
-    sampler, info = fit_truncated_normal(rev_growth, low=-0.05, high=0.20)
+    sampler, info = fit_truncated_normal(rev_growth)
     out["rev_growth"] = sampler
     out["rev_growth_info"] = info
 
