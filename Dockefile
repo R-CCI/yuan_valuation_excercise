@@ -9,6 +9,6 @@ RUN pip install --upgrade yfinance==0.2.54
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install -r requirements.txt
 RUN pip install dailytreasuryrates
-RUN dailytreasuryrates rates.csv
+RUN dailytreasuryrates "/name_data/rates.csv"
 
 ENTRYPOINT ["streamlit", "run", "Valuation.py", "--server.port=8080", "--server.address=0.0.0.0"]
