@@ -636,7 +636,7 @@ def main():
         st.markdown('<div class="input-section"><div style="font-size:1.3rem;font-weight:500;color:#c584f7">Financial Structure</div>', unsafe_allow_html=True)
         
         net_debt = debt_long - cash
-        d2e = debt / (price * shares) if price * shares > 0 else 0
+        d2e = debt / (total_equity) 
         
         cod = st.number_input("Cost of Debt", 0.0, 0.15, 0.04, 0.005, format="%.3f")
         tax = st.number_input("Effective Tax Rate", 0.0, 0.50, 0.25, 0.01, format="%.3f")
