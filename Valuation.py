@@ -260,35 +260,67 @@ st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
 
 
-def fit_lognormal(series):
-    """Fit a lognormal distribution from data."""
-    log_vals = np.log(series)
-    mu, sigma = log_vals.mean(), log_vals.std()
-    def sampler(n):
-        return np.exp(np.random.normal(mu, sigma, n))
-    return sampler, {"dist":"lognormal", "mu":mu, "sigma":sigma}
+def fit_lognormal(series, max_sigma=0.20):
+    """Fit a calm lognormal for financial growth rates."""
+    log_vals = np.log1p(series)          # safer: log(1+g)
+    mu = log_vals.mean()
+    sigma = min(log_vals.std(), max_sigma)  # clamp tail risk
 
-def fit_beta(series):
-    """Fit Beta distribution using method of moments."""
-    a = ((series.mean() * (1 - series.mean())) / series.var() - 1) * series.mean()
-    b = ((series.mean() * (1 - series.mean())) / series.var() - 1) * (1 - series.mean())
-    a, b = max(a,1e-3), max(b,1e-3)
+    def sampler(n):
+        s = np.random.normal(mu, sigma, n)
+        return np.expm1(s)               # convert back: exp(x) - 1
+
+    return sampler, {"dist": "lognormal", "mu": mu, "sigma": sigma}
+
+def fit_beta(series, clip_low=0.01, clip_high=0.99, min_var=1e-4):
+    """Stable Beta fit for ratios (margins/tax)."""
+    s = np.clip(series, clip_low, clip_high)
+
+    mean = s.mean()
+    var = max(s.var(), min_var)   # avoid division blowups
+
+    k = mean*(1-mean)/var - 1
+    a = max(mean*k, 1e-3)
+    b = max((1-mean)*k, 1e-3)
+
     def sampler(n):
         return np.random.beta(a, b, n)
+
     return sampler, {"dist":"beta", "a":a, "b":b}
 
-def fit_normal(series):
-    mu, sigma = series.mean(), series.std()
+def fit_normal(series, low=None, high=None, max_sigma=0.15):
+    """Bounded normal distribution with sigma controls."""
+    mu, sigma = series.mean(), min(series.std(), max_sigma)
+
     def sampler(n):
-        return np.random.normal(mu, sigma, n)
+        vals = np.random.normal(mu, sigma, n)
+        if low is not None: 
+            vals = np.maximum(vals, low)
+        if high is not None:
+            vals = np.minimum(vals, high)
+        return vals
+
     return sampler, {"dist":"normal", "mu":mu, "sigma":sigma}
 
 def fit_triangular(series):
-    """Triangular distribution: min, mode(last), max"""
-    c = (series.iloc[-1] - series.min()) / (series.max() - series.min())
+    """Safer triangular with median as mode."""
+    s = series.clip(lower=0)   # no negative margins or capex ratios
+
+    low = s.quantile(0.10)
+    mode = s.quantile(0.50)
+    high = s.quantile(0.90)
+
+    c = (mode - low) / (high - low + 1e-9)
+
     def sampler(n):
-        return triang.rvs(c=c, loc=series.min(), scale=series.max()-series.min(), size=n)
-    return sampler, {"dist":"triangular", "min":series.min(), "mode":series.iloc[-1], "max":series.max()}
+        return triang.rvs(
+            c=c,
+            loc=low,
+            scale=(high - low),
+            size=n
+        )
+
+    return sampler, {"dist":"triangular", "low":low, "mode":mode, "high":high}
 
 # -----------------------------------------------------------
 # 2. Automatic picker
