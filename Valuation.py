@@ -347,7 +347,7 @@ def extract_dcf_variables(income, bs):
     out["sales_to_cap_info"] = info
 
     # Tax rate
-    tax_exp = income.loc["Income Tax"].sort_index()
+    tax_exp = income.loc["Tax Provision"].sort_index()
     pretax = income.loc["Pretax Income"].sort_index()
     tax_rate = (tax_exp / pretax).clip(0,1).dropna()
     sampler, info = infer_distribution(tax_rate)
@@ -369,5 +369,6 @@ st.write(debt_long/equity_total)
 
 
 st.write(extract_dcf_variables(income, balance))
+
 
 
