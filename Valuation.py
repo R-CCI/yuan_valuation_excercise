@@ -359,7 +359,7 @@ def extract_dcf_variables(income, bs):
     return out
 
 res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
-balance, income, cashflow = res['balance'].T, res['income'].T, res['cashflow'].T
+balance, income, cashflow = res['balance'].T * 1000, res['income'].T * 1000, res['cashflow'].T * 1000
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
 sharesOutstanding = balance.loc['Share Issued'].iloc[0]
