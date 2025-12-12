@@ -249,8 +249,8 @@ def fetch_data(ticker_symbol):
 # Sidebar parameters
 st.sidebar.header("Parámetros")
 ticker_symbol = st.sidebar.text_input('Ticker', value='NVDA')
+ticker_symbol = st.sidebar.number_input('Tax Rate (%)', value=40, step=1)/100
 wacc = st.sidebar.number_input("WACC (%)", value=19.48, step=0.1) / 100
-fx_rate = st.sidebar.number_input("Tasa de Cambio DOP/USD", value=63.0, step=0.5)
 
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
@@ -259,7 +259,11 @@ dict_data = fetch_data('NVDA')
 res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'].T, res['income'].T, res['cashflow'].T
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
-st.write(debt_long )
+equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
+sharesOutstanding = balance.loc['Share Issued'].iloc[0]
+cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
+
+st.write(debt_long/equity_total)
 st.dataframe(balance)
 st.dataframe(income)
 st.dataframe(cashflow)
