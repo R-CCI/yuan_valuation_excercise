@@ -140,7 +140,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
         if not combined.empty:
             most_recent_idx = combined.index[0]
             combined = combined.copy()
-            combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
+            #combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
             # set source column
             def detect_source(idx):
                 # if idx equals any annual row originally in income_annual -> 'annual'
@@ -150,7 +150,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
                     return 'ttm_quarters_annualized' if getattr(ttm_income, 'attrs', {}).get('annualized_partial', False) else 'ttm_quarters'
                 else:
                     return 'derived'
-            combined['source'] = [detect_source(idx) for idx in combined.index]
+            #combined['source'] = [detect_source(idx) for idx in combined.index]
         out['income'] = combined
 
     # --- CASHFLOW ---
@@ -167,7 +167,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
         if not combined.empty:
             most_recent_idx = combined.index[0]
             combined = combined.copy()
-            combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
+            #combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
             def detect_source(idx):
                 if idx in cash_annual.index:
                     return 'annual'
@@ -175,7 +175,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
                     return 'ttm_quarters_annualized' if getattr(ttm_cash, 'attrs', {}).get('annualized_partial', False) else 'ttm_quarters'
                 else:
                     return 'derived'
-            combined['source'] = [detect_source(idx) for idx in combined.index]
+            #combined['source'] = [detect_source(idx) for idx in combined.index]
         out['cashflow'] = combined
 
     # --- BALANCE SHEET ---
@@ -199,10 +199,10 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
             combined = combined.sort_index(ascending=False)
             most_recent_idx = combined.index[0]
             combined = combined.copy()
-            combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
-            combined['source'] = [source_map.get(idx, 'annual') for idx in combined.index]
+            #combined['is_trailing'] = [idx == most_recent_idx for idx in combined.index]
+            #combined['source'] = [source_map.get(idx, 'annual') for idx in combined.index]
             # mark that balance sheet rows are not annualized
-            combined['annualized_partial'] = False
+            #combined['annualized_partial'] = False
         out['balance'] = combined
 
     return out
