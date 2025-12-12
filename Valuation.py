@@ -334,6 +334,38 @@ def fit_triangular(series):
 # 2. Automatic picker
 # -----------------------------------------------------------
 
+def capped_std(series, cap=0.10):
+    """Ensure σ ≤ cap * mean."""
+    mu = series.mean()
+    sigma = min(series.std(), abs(mu) * cap)
+    return mu, sigma
+
+def fit_truncated_normal(series, low, high):
+    """Fit a truncated normal within business logic bounds."""
+    mu, sigma = capped_std(series)
+    
+    a = (low - mu) / sigma
+    b = (high - mu) / sigma
+
+    def sampler(n):
+        return truncnorm.rvs(a, b, loc=mu, scale=sigma, size=n)
+
+    return sampler, {"dist": "truncnorm", "mu": mu, "sigma": sigma, "low": low, "high": high}
+
+def fit_uniform_margin(series, low=None, high=None):
+    """
+    EBITDA margin: stable and usually range-bound.
+    If no low/high provided, use historical min/max.
+    """
+
+    low = series.min() if low is None else low
+    high = series.max() if high is None else high
+
+    def sampler(n):
+        return uniform.rvs(loc=low, scale=high - low, size=n)
+
+    return sampler, {"dist": "uniform", "low": low, "high": high}
+    
 def infer_distribution(series):
     """Automatically select distribution based on data properties."""
     series = series.dropna()
@@ -360,14 +392,14 @@ def extract_dcf_variables(income, bs):
     # --------------------
     revenues = income.loc["Total Revenue"].sort_index()
     rev_growth = revenues.pct_change().dropna()
-    sampler, info = infer_distribution(rev_growth)
+    sampler, info = fit_truncated_normal(rev_growth_series, low=-0.05, high=0.20)
     out["rev_growth"] = sampler
     out["rev_growth_info"] = info
 
     # EBIT margin
     ebit = income.loc["Operating Income"].sort_index()
     ebit_margin = (ebit / revenues).dropna()
-    sampler, info = infer_distribution(ebit_margin)
+    sampler, info = fit_uniform_margin(ebit_margin)
     out["ebit_margin"] = sampler
     out["ebit_margin_info"] = info
 
