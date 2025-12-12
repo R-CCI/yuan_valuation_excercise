@@ -60,15 +60,15 @@ def fetch_data(ticker_symbol):
   # --- Valuation Inputs ---
   shares_outstanding = info.get('sharesOutstanding', 1)
   # Use market cap for Equity Value
-  equity_value = info.get('marketCap') / 1_000_000_000 # In Billions
+  equity_value = info.get('marketCap') 
   # Use Total Debt or Long Term Debt as a proxy for Debt Value
-  debt_value = info.get('totalDebt', info.get('longTermDebt', 0)) / 1_000_000_000 # In Billions
-  cash_non_operating_asset = info.get('totalCash', info.get('cash', 0)) / 1_000_000_000 # In Billions
+  debt_value = info.get('totalDebt', info.get('longTermDebt', 0))  
+  cash_non_operating_asset = info.get('totalCash', info.get('cash', 0)) 
 
   # --- Revenue and Margin Inputs ---
   # TTM Revenue as Revenue Base
   revenue_base = info.get('trailingAnnualRevenue', 0) / 1_000_000_000 # In Billions
-
+  
   # Historical Financials
   financials = ticker.financials.T
 
@@ -85,6 +85,13 @@ def fetch_data(ticker_symbol):
   # Levered Beta
   levered_beta = info.get('beta', 1.0)
 
+return {
+        "sharesOutstanding": sharesOutstanding,
+        "marketCap": equity_value,
+        "total_debt": debt_value,
+        "ebit": ebit, 
+        "beta": beta
+    }, ticker.balance_sheet, ticker.income_stmt 
 
 # Sidebar parameters
 st.sidebar.header("Parámetros")
@@ -95,4 +102,8 @@ fx_rate = st.sidebar.number_input("Tasa de Cambio DOP/USD", value=63.0, step=0.5
 st.sidebar.write("---")
 st.sidebar.header("Escenarios de Estrés")
 
+dict_data, b_s, i_s = fetch_data('NVDA')
+
+st.dataframe(b_s)
+st.dataframe(i_s)
 
