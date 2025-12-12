@@ -464,6 +464,21 @@ results = monte_carlo_dcf(
     n_sims=20000
 )
 
+vals = results["equity_per_share"]  # from your MC simulation
+mean_val = vals.mean()
+
+# -----------------------------------------------------------
+# Streamlit UI
+# -----------------------------------------------------------
+
+st.title("Monte Carlo DCF – Equity Value Distribution")
+
+st.subheader(f"Expected Value per Share: **${mean_val:,.2f}**")
+
+# Histogram bins selector
+bins = st.slider("Number of histogram bins", min_value=20, max_value=200, value=80)
+
+
 fig = px.histogram(
     vals,
     nbins=bins,
