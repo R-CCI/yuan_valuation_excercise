@@ -434,7 +434,7 @@ res = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','ca
 balance, income, cashflow = res['balance'].T * 1000, res['income'].T * 1000, res['cashflow'].T * 1000
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
-sharesOutstanding = balance.loc['Share Issued'].iloc[0]
+sharesOutstanding = yf.Ticker(ticker_symbol).info.get('sharesOutstanding', 1)
 cash = balance.loc['Cash And Cash Equivalents'].iloc[0]
 
 #rev_growth_mean, rev_growth_std = np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).mean(), np.log(1+ticker.income_stmt.loc['Total Revenue'].sort_index().pct_change(fill_method=None)).std()
@@ -554,7 +554,7 @@ bins = 80 #st.slider("Number of histogram bins", min_value=20, max_value=200, va
 fig = px.histogram(
     vals,
     nbins=bins,
-    title="DistribuCion del Valor por Acción",
+    title="Distribucion del Valor por Acción",
     opacity=0.75
 )
 
