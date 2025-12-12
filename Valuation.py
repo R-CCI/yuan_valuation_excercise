@@ -450,6 +450,8 @@ current_revenue = income.loc['Total Revenue'].iloc[0]
 debt = debt_long
 shares_outstanding  = sharesOutstanding
 
+distros = extract_dcf_variables(income, balance)
+
 results = monte_carlo_dcf(
     distros=distros,                # <-- from previous code
     current_revenue=current_revenue,
@@ -487,8 +489,6 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
-st.write(extract_dcf_variables(income, balance))
 
 
 
