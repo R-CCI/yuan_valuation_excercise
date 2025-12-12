@@ -48,6 +48,8 @@ from langchain.vectorstores import FAISS
 import pdfplumber
 import yfinance as yf
 import yahooquery as yq
+import subprocess
+subprocess.run(['dailytreasuryrates', '--output', 'rates.csv'], check=True)
 
 st.set_page_config(page_title="Valoración de Acciones", layout="wide")
 
