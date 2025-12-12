@@ -341,18 +341,36 @@ def capped_std(series, cap=0.10):
     sigma = min(series.std(), abs(mu) * cap)
     return mu, sigma
 
-def fit_truncated_normal(series):
-    """Fit a truncated normal within business logic bounds."""
-    low, high = series.min(), min(series.max(), 0.30)
-    mu, sigma = capped_std(series)
+def fit_truncated_normal(series, max_std=0.10):
+    """Fit a truncated normal distribution with clipped std."""
     
-    a = (low - mu) / sigma
-    b = (high - mu) / sigma
+    mu = series.mean()
+    sigma = min(series.std(), max_std * abs(mu))
+
+    # enforce a positive standard deviation
+    if sigma <= 0 or np.isnan(sigma):
+        sigma = max_std * abs(mu)
+        if sigma == 0:
+            # fallback: return constant sampler
+            def sampler(n):
+                return np.full(n, mu)
+            return sampler, {"dist": "constant", "value": mu}
+
+    # compute truncated bounds (± 3 std by default)
+    lower, upper = series.min(), series.max()
+    a = (lower - mu) / sigma
+    b = (upper - mu) / sigma
 
     def sampler(n):
         return truncnorm.rvs(a, b, loc=mu, scale=sigma, size=n)
 
-    return sampler, {"dist": "truncnorm", "mu": mu, "sigma": sigma, "low": low, "high": high}
+    return sampler, {
+        "dist": "truncnorm",
+        "mu": mu,
+        "sigma": sigma,
+        "lower": lower,
+        "upper": upper
+    }
 
 def fit_uniform_margin(series, low=None, high=None):
     """
