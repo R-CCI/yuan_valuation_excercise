@@ -108,7 +108,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
     Notes:
       - Balance sheet is point-in-time: no TTM sum; if annual missing, we use most recent quarter and flag it.
     """
-    ticker_obj = yf.Ticker(ticker)
+    ticker_obj = yf.Ticker(ticker_symbol)
     out = {}
     # fetch all relevant raw dfs from yfinance
     raw_income_annual = _transpose_and_parse(ticker_obj.financials)       # annual income
