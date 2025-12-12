@@ -16,6 +16,7 @@ from pydantic_ai.models.openai import OpenAIModel, OpenAIModelSettings
 import sys
 import io
 import os
+import plotly.express as px
 from PIL import Image
 import base64
 from rich.prompt import Prompt
