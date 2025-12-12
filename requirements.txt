@@ -18,6 +18,7 @@ pip>=23.2
 setuptools>=68.0.0
 wheel
 pydantic>=2.8.2
+dailytreasuryrates
 pydantic-ai==1.0.18
 torch
 numpy
