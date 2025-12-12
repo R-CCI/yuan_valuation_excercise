@@ -249,7 +249,7 @@ def fetch_data(ticker_symbol):
 # Sidebar parameters
 st.sidebar.header("Parámetros")
 ticker_symbol = st.sidebar.text_input('Ticker', value='NVDA')
-ticker_symbol = st.sidebar.number_input('Tax Rate (%)', value=40, step=1)/100
+tax_rate = st.sidebar.number_input('Tax Rate (%)', value=40, step=1)/100
 wacc = st.sidebar.number_input("WACC (%)", value=19.48, step=0.1) / 100
 
 st.sidebar.write("---")
