@@ -220,7 +220,7 @@ def get_financials_with_annualized_ttm(ticker_symbol: str,
             combined['annualized_partial'] = False
         out['balance'] = combined[[c for c in combined.columns if c not in ['is_trailing', 'source', 'annualized_partial']]]
 
-    return out, number_shares
+    return out, number_shares, price
 
 def fetch_data(ticker_symbol):
   ticker = yf.Ticker(ticker_symbol)
@@ -486,7 +486,7 @@ def extract_dcf_variables(income, bs):
 
     return out
 
-res, number_shares= get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
+res, number_shares, price = get_financials_with_annualized_ttm(ticker_symbol, statements=('income','cashflow','balance'), annualize_partial=True)
 balance, income, cashflow = res['balance'].T, res['income'].T , res['cashflow'].T 
 debt_long = balance.loc['Long Term Debt And Capital Lease Obligation'].iloc[0]
 equity_total = balance.loc['Total Equity Gross Minority Interest'].iloc[0]
@@ -604,6 +604,7 @@ results = monte_carlo_dcf(
 
 vals = results["equity_per_share"]  # from your MC simulation
 mean_val = vals.mean()
+
 def main():
     # Header
     st.markdown('<h1 class="main-header">Stocks Valuation Simulation</h1>', unsafe_allow_html=True)
@@ -628,12 +629,7 @@ def main():
         # Company Info
         st.markdown('<div class="input-section"><div style="font-size:1.3rem;font-weight:500;color:#c584f7">Company Information</div>', unsafe_allow_html=True)
         
-        company = st.text_input("Company Name", "Example Corp")
-        ticker = st.text_input("Ticker Symbol", "EXPL")
-        currency = st.selectbox("Currency", ["USD", "EUR", "GBP", "JPY", "CNY", "INR",  "KRW", "IDR"])
-        
-        price = st.number_input("Current Stock Price", 0.01, value=100.00, format="%.2f")
-        shares = st.number_input("Shares Outstanding (millions)", 0.1, value=100.00, format="%.2f")
+        shares = sharesOutstanding
         
         if st.button("Fetch Beta", use_container_width=True):
             with st.spinner("Fetching..."):
